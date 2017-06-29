@@ -1,0 +1,87 @@
+//yaogang modify for bad disk
+
+psBadDiskListPara
+
+EM_CONFIG_BAD_DISK
+
+SModConfigBadDisk
+
+ConfigGetBadDiskParam(&para->psBadDiskListPara[i],i,file))
+ConfigSetBadDiskParam(pTmp->psBadDiskListPara, nId, g_sConfigDevInfo.nFilePath))
+
+默认开启硬盘报警
+PageAlarmDeal.cpp
+mod_alarm.c void CheckAlarmDiskErr()
+
+坏盘认定条件：
+	一旦发现文件写入 超时或失败，即认定产生坏道，表明此块磁盘已经有损坏。
+
+如何标记坏盘：
+	在磁盘保留区中 MBR 后的一个扇区写入特定一段文字，作为标记。
+	这段特定文字是回文，出自拿破仑：“Able was I ere I saw Elba” (在我看到Elba岛之前，我曾所向无敌)
+	
+注意：执行磁盘格式化操作会擦除该标记
+
+录像时写操作所在位置
+
+RecordOpenNewFile()
+	custommp4_open()
+	custommp4_write_video_frame_with_buf() & custommp4_write_audio_frame_with_buf()
+	update_chn_cur_segment()
+	
+出现坏道后处理步骤：
+1、停止录像
+2、标记坏盘
+3、报警
+4、启动录像（此时标记为坏盘的磁盘将不在使用）	
+
+
+file->error_flag
+int custommp4_init(custommp4_t *file) 时 初始化为 0
+
+int custommp4_close(custommp4_t *file) 
+	if(file && file->open_mode != O_R && file->error_flag == 0 )
+	{
+		更新文件信息
+	}
+	
+int custommp4_write_video_frame_with_buf(......)
+{
+	if(file->error_flag)
+	{
+		printf("yg  custommp4_write_video_frame_with_buf error_flag 1\n");
+		return 0;
+	}
+	
+	......
+}
+
+void RecordMainFxn(void* ID)
+{
+	......
+	if(error_flag == 0 && rtn == 1)
+	{
+		if(0 == update_chn_cur_segment(p_ptn_index[sMsg.nChn], sMsg.nChn, &s_u_info[sMsg.nChn], 1))
+		{
+			printf("update_chn_cur_segment chn[%d] failed!*******\n", sMsg.nChn);
+		}
+	}
+	......
+}
+
+int custommp4_set_position(custommp4_t *file, int position)
+{
+	if(position > (int)SIZE_OF_FILE_VECTOR || position < 0)
+	{
+		file->error_flag = 1;
+		printf("warning:set pos error:cur_pos=%ld,set_pos=%d\n",file->file_position,position);
+		return -1;//csp modify//MR HDD
+	}
+	file->file_position = position;
+	return 1;
+}
+
+int custommp4_write_data(custommp4_t *file,void *data,int size)
+
+
+

@@ -1,0 +1,192 @@
+改进点：
+1、网络协议加入心跳部分，SDK内对连接的NVR轮巡发心跳包，有无回应都要回调上层应用
+2、NVR端修改IPC和OSD后要通知客户端。
+
+跃天DDR4G 2G切换修改
+1、宏
+common\inc\tlsdk\lib_vdec.h
+#define DDR4G
+//#undef DDR4G
+
+2、文件系统中 load3535文件
+home\root\all\ko目录下
+2G
+insmod mmz.ko mmz=anonymous,0,0x94000000,191M:jpeg,0,0x9ff00000,1M anony=1 || report_error
+4G
+insmod mmz.ko mmz=anonymous,0,0x94000000,702M:jpeg,0,0xbfe00000,2M anony=1 || report_error
+
+
+
+mount -o nolock 192.168.1.56:/mnt/nfs /mnt
+rm -rf myapp mydaemon lib
+mkdir lib
+cp /mnt/myapp .
+cp /mnt/mydaemon .
+cp /mnt/*.so lib/
+cp -d /home/root/all/lib/libstdc\+\+.so* /root/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/lib:/root/onvif
+./myapp
+
+mount -o nolock 192.168.7.134:/mnt/nfs /mnt
+rm -rf myapp lib
+mkdir lib
+cp /mnt/myapp .
+cp /mnt/*.so lib/
+cp -d /home/root/all/lib/libstdc\+\+.so* /root/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/lib:/root/onvif
+./mydaemon &
+./myapp
+
+
+ifconfig eth0 192.168.1.114
+
+mount -o nolock 192.168.1.32:/mnt/nfs /mnt
+rm -rf myapp mydaemon lib
+mkdir lib
+cp /mnt/myapp .
+cp /mnt/mydaemon .
+cp /mnt/*.so lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/lib:/root/onvif
+./mydaemon &
+./myapp
+
+mount -o nolock 192.168.1.32:/mnt/nfs /mnt
+rm -rf myapp mydaemon lib
+mkdir lib
+cp /mnt/myapp .
+cp /mnt/*.so lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/lib:/root/onvif
+./myapp
+
+
+./mydaemon &
+cp /mnt/nfs/arm-gdbserver .
+./arm-gdbserver 192.168.1.134:65533 myapp
+
+mount -o nolock 192.168.1.32:/mnt/nfs /mnt
+cd /mnt/NetworkKeyboad
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/NetworkKeyboad
+
+
+mount -o nolock 192.168.1.32:/mnt/nfs /mnt
+cp -d /mnt/libparted.so* /root/lib/
+cp /mnt/parted /root
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/lib
+ 
+
+tl_hslib_com.c //yg123
+BizData.cpp	//yg123
+
+
+鼠标绘制有黑块：修改文件GuiSample1/source/Cursor.cpp
+
+一、修改logo
+	1、开机logo: 
+		1) 在u-boot下，命令：mw.b 0x82000000 0xff 0x20000; tftp 0x82000000 hi3535/logo_start.jpg; sf probe 0; sf erase 0x80000 0x20000; sf write 0x82000000 0x80000 $(filesize);
+		2) 注意：在虚拟机下，文件系统目录下的logo_start.jpg，在执行make命令后会覆盖上一步中的logo，所以要一起修改。
+	2、应用logo:
+		1) 使用定制工具 -- 修改应用系统logo，产生container.bin。
+		2) 拷贝container.bin到虚拟机--文件系统目录下。执行make后产生mainboard.bin。
+
+二、DDR从2GB-->4GB
+	1、在虚拟机 Hi3535_SDK_V2.0.4.0/osdrv/tools/pc_tools/uboot_tools目录下有对应DDR大小的xls文件，打开--点击按键生成寄存器值文件。
+	2、在u-boot下，命令：setenv bootargs 'mem=320M console=ttyAMA0,115200 root=1f04 rootfstype=cramfs mtdparts=hi_sfc:512K(uboot+env),128K(ulogo),256K(config),3712K(uImage),10624K(fs),1024K(userdata),128K(p2p) pcimod=host'
+	3、在虚拟机下，修改文件系统目录下 rootfs_uclibc/home/root/all/ko目录下load3535文件：
+		insmod mmz.ko mmz=anonymous,0,0x94000000,191M:jpeg,0,0x9ff00000,1M anony=1 || report_error
+		0x94000000：分配给海思MPP使用的内存的起始地址(0x80000000+分配给Linux的内存大小)
+		191M：分配给海思MPP使用的内存的大小
+		0x9ff00000,1M：是分配给jpeg编码使用的。
+		
+2015.03.14 修改记录
+图片保存逻辑修改  record.c partition.c
+格式化硬盘前后给图片保存线程发消息  PageDiskMgr.cpp--Format()
+	
+s32 BizGetDvrInfo( SBizDvrInfo* pInfo )
+{
+	return ConfigGetDvrInfo(0, pInfo);
+}
+
+SBizDvrInfo DvrInfo;
+if (BizGetDvrInfo(&DvrInfo) == 0)
+{
+	if (DvrInfo.nNVROrDecoder == 2) //解码器版本
+	{
+	}
+}
+切换
+32路NVR需要注意的地方
+1、视频丢失检测 CheckAlarmVlosts() --> tl_video_connection_status() --> unsigned int rtn 变量bit位将不够用
+
+
+跃天: 1 nvr，2 轮巡解码器，3 切换解码器
+
+if (nNVROrDecoder == 2)//轮巡型解码器
+{
+}
+else //NVR or 切换型解码器 
+{
+}
+
+NVR 报警16进4出
+AlarmIn9	P106	COL2	GPIO14-3
+AlarmIn10	P105	COL3	GPIO14-4
+AlarmIn11	P104	COL1	GPIO14-1
+AlarmIn12	P102	COL0	GPIO14-0
+AlarmIn13	P101	ROW2	GPIO13-2
+AlarmIn14	P097	ROW1	GPIO13-1
+AlarmIn15	P015			GPIO0-4
+AlarmIn16	P099	ROW0	GPIO13-0
+
+ALMOUT3		P014			GPIO0-3
+ALMOUT4		P013			GPIO0-2
+AlarmIn15	P015			GPIO0-4
+
+
+轮巡通道数目 修改
+nVidMainNum
+
+//yaogang modify 20160330
+//NVR 不带深广平台版本
+#define NO_MODULE_SG
+
+bug report:
+远程命令：CTRL_CMD_GETADDIPCLIST，回应数据长度 4870 超过 g_byAckBuf[4096];
+解决方案：暂时加大 g_byAckBuf[4096*2]，等做到搜索文件时再修改
+
+nvr svn 版本2 版本3差异 存疑：
+pagelogin:
+//u32 key = (8 << 16) | (0 << 8) | 0;
+u32 key = (10 << 16) | (0 << 8) | 0;
+
+报警类型的修改，我对之前的报警类型做了重新排列
+netcomm.c
+#define AUTYPENUM	 13
+
+
+
+NVR:
+1、掉硬盘
+2、崩溃
+3、IPC时间同步
+
+github 创建代码仓库 并 初次提交
+…or create a new repository on the command line
+echo "# NVR" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin git@github.com:yao3gang/NVR.git
+git push -u origin master
+
+…or create a new repository on the command line
+echo "# NVR" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/yao3gang/NVR.git
+git push -u origin master
+
+提交
+git add .
+git commit -m "xxx"
+git push

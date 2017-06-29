@@ -1,0 +1,33 @@
+预览缓冲队列出错后重置 --- 出现的问题
+判断得知 当前使用子码流预览（vdec_type: 2），所以chn30在 StatusChnRst 状态中 关闭/重置 相应的VDEC通道
+因为设备当前正在4通道轮巡，在 StatusChnWaitBuf 状态中通道变为需要解主码流（vdec_type: 1），导致相应的VDEC通道没有START
+
+NVRPreviewFxnChn chn30 1 read queue failure, cur_pts: 3598800605, success times: 0, pre frame header:
+NVRPreviewFxnChn StatusChnStart chn30, vdec_type: 2, time: 3598800614
+NVRPreviewFxnChn chn30 protocol: 8
+NVRPreviewFxnChn StatusChnWaitIframe chn30, bprocess: 1, time: 3598800614
+NVRPreviewFxnChn StatusChnWaitBuf chn30, vdec_type: 1, time: 3598801494
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+NVRPreviewFxnChn StatusChnPreview chn30, vdec_type: 1, bprocess: 0
+         IpcPts: 64567438000, QueueLastIPCPtsChn[30]: 64567838000, time: 3598801904
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009
+chn14 function:nvr_preview_vdec_write,line:3259,send to vdec 0xa0058009

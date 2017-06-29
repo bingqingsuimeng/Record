@@ -1,0 +1,6 @@
+I2c		at88sc	hi3535	NADN FLASH
+sda		5		NF_DQ7	44
+scl		6		NF_DQ6	43
+
+3V3		8				
+GND		4

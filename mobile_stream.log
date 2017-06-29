@@ -1,0 +1,22 @@
+gp_cmd_callback -- deal_command
+
+ThirdStreamThrFxn()
+	tl_venc_third_read()
+	lib_gbl_info.pThirdStreamCB(&venc_stream); -- DealThirdStream
+	
+DealThirdStream()
+	pfnEncodeProc(&sEncodeHead, nContent); -- EncodeDeal
+EncodeDeal		
+	EncDataDispatch
+		NetCommSendPreviewFrame
+·¢ËÍ
+NetCommSendPreviewFrame() -- GetMsgQWriteInfo()
+	mb_StreamThread()
+	{
+		GetMsgQReadInfo()
+		mb_SendStream()
+	}
+		mb_SendStream()
+			mobile_send_media_frame()
+				sendVideoToMobileServer()
+					owspSendVideo()

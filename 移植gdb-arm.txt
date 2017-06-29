@@ -1,0 +1,13 @@
+移植gdb-arm，在arm上运行
+1、移植termcap
+./configure --prefix=/usr/local/termcap-arm --target=arm-hisiv100nptl-linux
+看了下makefile文件，发现host设置并未生效，不知道咋回事，所以手动改了下编译器，把gcc改成了arm-hisiv100nptl-linux-gcc
+
+make
+make install
+
+
+2.编译gdb
+./configure --prefix=/usr/local/gdb-arm --host=arm-hisiv100nptl-linux  --without-x --disable-gdbtk --disable-tui --without-included-regex --without-included-gettext CPPFLAGS="-I/usr/local/termcap-arm/include/" LDFLAGS="-L/usr/local/termcap-arm/lib" LD="-ltermcap"
+
+
